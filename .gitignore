@@ -1,0 +1,53 @@
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, coverage
+*.test
+coverage.out
+
+# Build output directories
+/bin/
+/build/
+/dist/
+
+# Vendor directory
+/vendor/
+
+# Dependency directories (editors / temp)
+*.swp
+*~
+
+# Editor/IDE directories
+.vscode/
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+
+# Database files
+*.db
+*.sqlite
+*.db3
+
+# Logs
+*.log
+
+# Temporary folders used in this project
+tmp/
+
+# Node modules (if frontend added later)
+node_modules/
+
+# Local binary output (GOBIN/GOPATH local bins)
+GOBIN/
