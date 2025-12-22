@@ -4,6 +4,14 @@ github.com/JuD4Mo/go_api_web_domain v0.0.1 h1:Lm+zzgmgmtpkbGUsB9ffUse0RTapEbtsMl
 github.com/JuD4Mo/go_api_web_domain v0.0.1/go.mod h1:w5vWqAHmQuQU+Hlj/TrdueB7v37GxqHi7Lvju6tIMoM=
 github.com/JuD4Mo/go_api_web_meta v0.0.1 h1:OkTtXDX8+F4zG5ZjEWOgMKmxhp8C/2u4D/wWQHP7XRU=
 github.com/JuD4Mo/go_api_web_meta v0.0.1/go.mod h1:3vjB00EaxcDEJuNkHthNx/5gZGdkZ/N5bb9AFhj+zC4=
+github.com/JuD4Mo/go_lib_response v0.0.1 h1:VYKRJbaa7XJ0+JsuCsBFWy3h2wuRKPZ7PGv0HsGD9wo=
+github.com/JuD4Mo/go_lib_response v0.0.1/go.mod h1:8YOXLUuDnX+FFC7VAdYX8ACPYPFiHcFOe2JTEDJ4jug=
+github.com/go-kit/kit v0.13.0 h1:OoneCcHKHQ03LfBpoQCUfCluwd2Vt3ohz+kvbJneZAU=
+github.com/go-kit/kit v0.13.0/go.mod h1:phqEHMMUbyrCFCTgH48JueqrM3md2HcAZ8N3XE4FKDg=
+github.com/go-kit/log v0.2.0 h1:7i2K3eKTos3Vc0enKCfnVcgHh2olr/MyfboYq7cAcFw=
+github.com/go-kit/log v0.2.0/go.mod h1:NwTd00d/i8cPZ3xOwwiv2PO5MOcx78fFErGNcVmBjv0=
+github.com/go-logfmt/logfmt v0.5.1 h1:otpy5pqBCBZ1ng9RQ0dPu4PN7ba75Y/aA+UpowDyNVA=
+github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/go-sql-driver/mysql v1.8.1 h1:LedoTUt/eveggdHS9qUFC1EFSa8bU2+1pZjSRpvNJ1Y=
 github.com/go-sql-driver/mysql v1.8.1/go.mod h1:wEBSXgmK//2ZFJyE+qWnIsVGmvmEKlqwuVSjsCm7DZg=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=

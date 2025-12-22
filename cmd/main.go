@@ -1,21 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/JuD4Mo/go_api_web_user/internal/user"
 	"github.com/JuD4Mo/go_api_web_user/pkg/bootstrap"
-	"github.com/gorilla/mux"
+	"github.com/JuD4Mo/go_api_web_user/pkg/handler"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-
-	//Instancia de un router de Gorilla Mux
-	router := mux.NewRouter()
 
 	//Cargamos las variables de entorno que están en el archivo .env por medio del package godotenv
 	_ = godotenv.Load()
@@ -33,33 +32,33 @@ func main() {
 		l.Fatal("paginator limit default is required")
 	}
 
+	ctx := context.Background()
+
 	//Instancias de las capas: repositorio, servicio y controlador
 	userRepo := user.NewRepo(l, db)
 	userService := user.NewService(l, userRepo)
-	userEnd := user.MakeEndpoints(userService, user.Config{LimitPage: pagLimDef})
-
-	//Por medio del router de Gorilla Mux servimos los endpoints
-	router.HandleFunc("/users", userEnd.Create).Methods("POST")
-	router.HandleFunc("/users/{id}", userEnd.Get).Methods("GET")
-	router.HandleFunc("/users", userEnd.GetAll).Methods("GET")
-	router.HandleFunc("/users/{id}", userEnd.Update).Methods("PATCH")
-	router.HandleFunc("/users/{id}", userEnd.Delete).Methods("DELETE")
+	h := handler.NewUserHTTPServer(ctx, user.MakeEndpoints(userService, user.Config{LimitPage: pagLimDef}))
 
 	port := os.Getenv("PORT")
 	address := fmt.Sprintf("127.0.0.1:%s", port)
 
 	//Se crea una instancia de un servidor
 	srv := &http.Server{
-		Handler:      router,
+		Handler:      accessControl(h),
 		Addr:         address,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 	}
 
-	//Se sirve la aplicación y se le vanta el servidor
-	err = srv.ListenAndServe()
+	errCh := make(chan error)
+	go func() {
+		l.Println("listen in", address)
+		errCh <- srv.ListenAndServe()
+	}()
+
+	err = <-errCh
 	if err != nil {
-		l.Fatal(err)
+		log.Fatal(err)
 	}
 
 	// port := ":3000"
@@ -71,6 +70,20 @@ func main() {
 	// if err != nil {
 	// 	fmt.Println(err)
 	// }
+}
+
+func accessControl(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,POST, PATCH, OPTIONS, DELETE, HEAD")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	})
 }
 
 // func getUsers(w http.ResponseWriter, r *http.Request) {

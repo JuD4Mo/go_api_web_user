@@ -2,9 +2,17 @@ module github.com/JuD4Mo/go_api_web_user
 
 go 1.25.5
 
-require gorm.io/gorm v1.31.1
+require (
+	github.com/go-kit/kit v0.13.0
+	gorm.io/gorm v1.31.1
+)
 
-require filippo.io/edwards25519 v1.1.0 // indirect
+require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/JuD4Mo/go_lib_response v0.0.1 // indirect
+	github.com/go-kit/log v0.2.0 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
+)
 
 require (
 	github.com/JuD4Mo/go_api_web_domain v0.0.1
