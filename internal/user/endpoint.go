@@ -35,7 +35,12 @@ type (
 		Page      int
 	}
 
+	DeleteReq struct {
+		ID string
+	}
+
 	UpdateReq struct {
+		ID        string
 		FirstName *string `json:"first_name"`
 		LastName  *string `json:"last_name"`
 		Email     *string `json:"email"`
@@ -52,8 +57,8 @@ func MakeEndpoints(s Service, config Config) Endpoints {
 		Create: makeCreateEndpoint(s),
 		Get:    makeGetEndpoint(s),
 		GetAll: makeGetAllEndpoint(s, config),
-		// Update: makeUpdateEndpoint(s),
-		// Delete: makeDeleteEndpoint(s),
+		Update: makeUpdateEndpoint(s),
+		Delete: makeDeleteEndpoint(s),
 	}
 }
 
@@ -112,6 +117,9 @@ func makeGetAllEndpoint(s Service, config Config) Controller {
 
 		users, err := s.GetAll(ctx, filters, meta.Offset(), meta.Limit())
 		if err != nil {
+			if err == ErrUserNotFound {
+				return nil, response.NotFound(err.Error())
+			}
 			return nil, response.InternalServerError(err.Error())
 		}
 
@@ -120,78 +128,45 @@ func makeGetAllEndpoint(s Service, config Config) Controller {
 	}
 }
 
-/*
 func makeUpdateEndpoint(s Service) Controller {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var updateReq UpdateReq
-
-		err := json.NewDecoder(r.Body).Decode(&updateReq)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&Response{
-				Status: http.StatusBadRequest,
-				Err:    err.Error(),
-			})
-			return
-		}
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		updateReq := request.(UpdateReq)
 
 		//validaciones
-
 		if updateReq.FirstName != nil && *updateReq.FirstName == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&Response{
-				Status: http.StatusBadRequest,
-				Err:    "first name is required",
-			})
-			return
+			return nil, response.BadRequest(ErrFirstNameRequired.Error())
 		}
 
 		if updateReq.LastName != nil && *updateReq.LastName == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&Response{
-				Status: http.StatusBadRequest,
-				Err:    "last name is required",
-			})
-			return
+			return nil, response.BadRequest(ErrLastNameRequired.Error())
 		}
 
-		path := mux.Vars(r)
-		id := path["id"]
-
-		err = s.Update(id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
+		id := updateReq.ID
+		err := s.Update(ctx, id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
-			json.NewEncoder(w).Encode(&Response{
-				Status: http.StatusBadRequest,
-				Err:    "user does not exist",
-			})
-			return
+			if err == ErrUserNotFound {
+				return nil, response.NotFound(err.Error())
+			}
+			return nil, response.InternalServerError(err.Error())
 		}
 
-		json.NewEncoder(w).Encode(&Response{
-			Status: http.StatusOK,
-			Data:   map[string]string{"message": "updated!"},
-		})
+		return response.Created("updated", nil, nil), nil
 	}
 }
 
 func makeDeleteEndpoint(s Service) Controller {
-	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		path := mux.Vars(r)
-		id := path["id"]
-		err := s.Delete(id)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(&Response{
-				Status: http.StatusBadRequest,
-				Err:    err.Error(),
-			})
-		}
-		json.NewEncoder(w).Encode(&Response{
-			Status: http.StatusOK,
-			Data:   map[string]string{"response": "deleted complete"},
-		})
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
 
+		req := request.(DeleteReq)
+
+		err := s.Delete(ctx, req.ID)
+		if err != nil {
+			if err == ErrUserNotFound {
+				return nil, response.NotFound(err.Error())
+			}
+			return nil, response.InternalServerError(err.Error())
+		}
+
+		return response.OK("deleted", nil, nil), nil
 	}
 }
-*/

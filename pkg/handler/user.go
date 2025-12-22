@@ -43,6 +43,20 @@ func NewUserHTTPServer(ctx context.Context, endpoints user.Endpoints) http.Handl
 		opts...,
 	)).Methods("GET")
 
+	r.Handle("/users/{id}", httptransport.NewServer(
+		endpoint.Endpoint(endpoints.Update),
+		decodeUpdate,
+		encodeResponse,
+		opts...,
+	)).Methods("PATCH")
+
+	r.Handle("/users/{id}", httptransport.NewServer(
+		endpoint.Endpoint(endpoints.Delete),
+		decodeDelete,
+		encodeResponse,
+		opts...,
+	)).Methods("DELETE")
+
 	return r
 }
 
@@ -81,6 +95,34 @@ func decodeGetAll(_ context.Context, r *http.Request) (interface{}, error) {
 	return req, nil
 }
 
+func decodeUpdate(_ context.Context, r *http.Request) (interface{}, error) {
+
+	var req user.UpdateReq
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		return nil, response.BadRequest(fmt.Sprintf("invalid request format: %v", err.Error()))
+	}
+
+	path := mux.Vars(r)
+	id := path["id"]
+
+	req.ID = id
+
+	return req, nil
+}
+
+func decodeDelete(_ context.Context, r *http.Request) (interface{}, error) {
+	path := mux.Vars(r)
+	id := path["id"]
+
+	req := user.DeleteReq{
+		ID: id,
+	}
+
+	return req, nil
+}
+
 func encodeResponse(ctx context.Context, w http.ResponseWriter, resp interface{}) error {
 	r := resp.(response.Response)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -95,11 +137,3 @@ func encodedError(_ context.Context, err error, w http.ResponseWriter) {
 	_ = json.NewEncoder(w).Encode(resp)
 
 }
-
-/*
-	router.HandleFunc("/users", userEnd.Create).Methods("POST")
-	router.HandleFunc("/users/{id}", userEnd.Get).Methods("GET")
-	router.HandleFunc("/users", userEnd.GetAll).Methods("GET")
-	router.HandleFunc("/users/{id}", userEnd.Update).Methods("PATCH")
-	router.HandleFunc("/users/{id}", userEnd.Delete).Methods("DELETE")
-*/

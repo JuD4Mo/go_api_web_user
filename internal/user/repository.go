@@ -64,7 +64,7 @@ func (repo *repo) Get(ctx context.Context, id string) (*domain.User, error) {
 
 	if result.Error != nil {
 		repo.log.Println(result.Error)
-		return nil, result.Error
+		return nil, ErrUserNotFound
 	}
 
 	return &user, nil
@@ -79,6 +79,9 @@ func (repo *repo) Delete(ctx context.Context, id string) error {
 	if result.Error != nil {
 		repo.log.Println(result.Error)
 		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrUserNotFound
 	}
 
 	return nil
@@ -104,6 +107,10 @@ func (repo *repo) Update(ctx context.Context, id string, firstName, lastName, em
 	if res.Error != nil {
 		repo.log.Println(res.Error)
 		return res.Error
+	}
+
+	if res.RowsAffected == 0 {
+		return ErrUserNotFound
 	}
 	return nil
 }
