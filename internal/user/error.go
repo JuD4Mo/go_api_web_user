@@ -1,8 +1,17 @@
 package user
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var ErrFirstNameRequired = errors.New("first name is required")
 var ErrLastNameRequired = errors.New("last name is required")
 
-var ErrUserNotFound = errors.New("user does not exist")
+type ErrorNotFound struct {
+	UserId string
+}
+
+func (e *ErrorNotFound) Error() string {
+	return fmt.Sprintf("user '%s' does not exist", e.UserId)
+}

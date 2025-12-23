@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 
 	"github.com/JuD4Mo/go_api_web_meta/meta"
 	"github.com/JuD4Mo/go_lib_response/response"
@@ -117,7 +118,7 @@ func makeGetAllEndpoint(s Service, config Config) Controller {
 
 		users, err := s.GetAll(ctx, filters, meta.Offset(), meta.Limit())
 		if err != nil {
-			if err == ErrUserNotFound {
+			if errors.As(err, &ErrorNotFound{}) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
@@ -144,7 +145,7 @@ func makeUpdateEndpoint(s Service) Controller {
 		id := updateReq.ID
 		err := s.Update(ctx, id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
 		if err != nil {
-			if err == ErrUserNotFound {
+			if errors.As(err, &ErrorNotFound{}) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
@@ -161,7 +162,7 @@ func makeDeleteEndpoint(s Service) Controller {
 
 		err := s.Delete(ctx, req.ID)
 		if err != nil {
-			if err == ErrUserNotFound {
+			if errors.As(err, &ErrorNotFound{}) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
