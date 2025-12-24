@@ -118,7 +118,8 @@ func makeGetAllEndpoint(s Service, config Config) Controller {
 
 		users, err := s.GetAll(ctx, filters, meta.Offset(), meta.Limit())
 		if err != nil {
-			if errors.As(err, &ErrorNotFound{}) {
+			var nf *ErrorNotFound
+			if errors.As(err, &nf) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
@@ -145,7 +146,8 @@ func makeUpdateEndpoint(s Service) Controller {
 		id := updateReq.ID
 		err := s.Update(ctx, id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
 		if err != nil {
-			if errors.As(err, &ErrorNotFound{}) {
+			var nf *ErrorNotFound
+			if errors.As(err, &nf) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
@@ -162,7 +164,8 @@ func makeDeleteEndpoint(s Service) Controller {
 
 		err := s.Delete(ctx, req.ID)
 		if err != nil {
-			if errors.As(err, &ErrorNotFound{}) {
+			var nf *ErrorNotFound
+			if errors.As(err, &nf) {
 				return nil, response.NotFound(err.Error())
 			}
 			return nil, response.InternalServerError(err.Error())
