@@ -88,7 +88,11 @@ func makeGetEndpoint(s Service) Controller {
 
 		user, err := s.Get(ctx, req.ID)
 		if err != nil {
-			return nil, response.NotFound(err.Error())
+			var nf *ErrorNotFound
+			if errors.As(err, &nf) {
+				return nil, response.NotFound(err.Error())
+			}
+			return nil, response.InternalServerError(err.Error())
 		}
 
 		return response.OK("success", user, nil), nil
@@ -118,10 +122,6 @@ func makeGetAllEndpoint(s Service, config Config) Controller {
 
 		users, err := s.GetAll(ctx, filters, meta.Offset(), meta.Limit())
 		if err != nil {
-			var nf *ErrorNotFound
-			if errors.As(err, &nf) {
-				return nil, response.NotFound(err.Error())
-			}
 			return nil, response.InternalServerError(err.Error())
 		}
 
